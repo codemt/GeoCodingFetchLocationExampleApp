@@ -9,14 +9,34 @@
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <title>My GeoCode App</title>
 </head>
-<body onload="geoCode()"> 
-        <h1>  My Geo Code Location  </h1>
+<!-- on load is not called now , as onClick submit function is used. -->
+<body>    
     <div class="container">
-            <div id="formatted-address"></div>
+            <h1>  My Geo Code Location  </h1>
+             <h2 id="text-center"> Enter Location </h2>
+             <form action="" id="location-form">
+
+                    <input type="text" id="location-input" class="form-control form-control-lg">
+                    <br>
+                    <button type="submit" class="btn btn-primary btn-block"> Submit  </button>
+                    <br> 
+             </form>
+            <div class="card-block" id="formatted-address"></div>
+            <div class="card-block" id="address-components"></div>
+            <div class="card-block" id="geometry"> </div>
     </div>
         <script> 
-            function geoCode(){
-                    var location = '22 Main st Boston MA';
+
+        // get location form
+        var locationForm = document.getElementById('location-form');
+
+        // listen for submit
+        locationForm.addEventListener('submit',geoCode);
+            function geoCode(e){
+
+                // prevent default action
+                e.preventDefault();
+                    var location = document.getElementById('location-input').value;
                     axios.get('https://maps.googleapis.com/maps/api/geocode/json',{
 
                         params:{
@@ -34,16 +54,49 @@
                             var formattedAddress = response.data.results[0].formatted_address;
 
                             // Address components
+                            var addressComponents = response.data.results[0].address_components;
+                            var addressComponentsOutput = '<ul class="list-group">';
+                            for(var i=0;i<addressComponents.length;i++){
+
+                                    addressComponentsOutput += `
+                                        <li class="list-group-item">
+                                        <strong>${addressComponents[i].types[0]}
+                                        </strong> :${addressComponents[i].long_name}</li>
+                                    
+                                    `;
+
+                            }
+                            addressComponentsOutput += '</ul>';
+
+                            var lat = response.data.results[0].geometry.location.lat;
+                            var lng = response.data.results[0].geometry.location.lng;
+                             // send geometry to App 
+                             var geometryOutput = '<ul class="list-group">';
+                                geometryOutput += `
+                                
+                                
+                                    <li class="list-group-item"><strong> Latitude </strong> : ${lat} </li>
+                                    <li class="list-group-item"> <strong> Longitude </strong> :  ${lng} </li>
+                            
+                        
+                                `;
+                            geometryOutput += '</ul>';
+                            document.getElementById('geometry').innerHTML = geometryOutput; 
+
+
+                            // send address Components to App
+                            document.getElementById('address-components').innerHTML = addressComponentsOutput; 
+
                             // store it
-                            var output = `
+                            var formattedAddressOutput = `
                             
                                     <ul class="list-group">
-                                        <li class="list-item"> ${formattedAddress} </li>
+                                        <li class="list-group-item"> ${formattedAddress} </li>
                                     </ul>
                             
                             `;
-                            // send output to App
-                            document.getElementById('formatted-address').innerHTML = output;
+                            // send formatted Address to App
+                            document.getElementById('formatted-address').innerHTML = formattedAddressOutput;
 
                     })
                     .catch(function(error){
