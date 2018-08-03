@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <title>My GeoCode App</title>
+</head>
+<body onload="geoCode()"> 
+        <h1>  My Geo Code Location  </h1>
+    <div class="container">
+            <div id="formatted-address"></div>
+    </div>
+        <script> 
+            function geoCode(){
+                    var location = '22 Main st Boston MA';
+                    axios.get('https://maps.googleapis.com/maps/api/geocode/json',{
+
+                        params:{
+
+                             address : location,
+                             key : 'AIzaSyCy0U6O04I-JJaFML2qWY6CZzBVPI8sfXo' 
+
+                        }
+
+                    })
+                    .then(function(response){
+
+                            console.log(response);
+                            //Formatted Address
+                            var formattedAddress = response.data.results[0].formatted_address;
+
+                            // Address components
+                            // store it
+                            var output = `
+                            
+                                    <ul class="list-group">
+                                        <li class="list-item"> ${formattedAddress} </li>
+                                    </ul>
+                            
+                            `;
+                            // send output to App
+                            document.getElementById('formatted-address').innerHTML = output;
+
+                    })
+                    .catch(function(error){
+
+
+                            console.log(error);
+
+                    })
+
+                    
+
+            }
+        </script>
+</body>
+</html>
